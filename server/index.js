@@ -12,6 +12,7 @@ require('dotenv').config();
 
 const { DB_PATH } = require('./db');
 const { err } = require('./db');
+const { seedIfEmpty } = require('./seed');
 
 const authRoutes = require('./routes/auth');
 const papersRoutes = require('./routes/papers');
@@ -57,6 +58,15 @@ app.use((error, req, res, next) => {
   if (status === 500) console.error('[ERROR]', error);
   res.status(status).json({ error: { code, message } });
 });
+
+// 启动时自动补示例数据：仅当试卷表为空才灌（不清空用户上传）。
+// 这样即便托管平台没应用 render.yaml 里的启动命令、或免费层重启清空了数据，
+// 服务一起来也会自动恢复 14 张示例卷，首页不会空白。
+try {
+  seedIfEmpty();
+} catch (e) {
+  console.error('[SEED] 启动自动灌示例数据失败（不影响服务启动）：', e.message);
+}
 
 app.listen(PORT, () => {
   console.log(`答岸服务已启动：http://localhost:${PORT}`);

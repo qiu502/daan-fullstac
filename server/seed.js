@@ -1,11 +1,15 @@
 'use strict';
 /**
- * 答岸 · 种子脚本
- * 直接从源文件 答岸.html 解析出真实的 BUILTIN_PAPERS（14 张公开真题），
- * 按 b1..b14 → 整数 id 1..14 映射，清空 papers 后写入。
- * questions 以 JSON 字符串存储；uploader_id = NULL；source = 'official'。
+ * 答岸 · 种子脚本 / 可复用灌数据模块
  *
- * 用法：node --experimental-sqlite server/seed.js
+ * 数据来源优先级：
+ *   1) 仓库内 JSON：server/data/builtin-papers.json（部署环境用，随代码一起进仓库）
+ *   2) 回退：本地 答岸.html 解析出的 BUILTIN_PAPERS（开发机用）
+ *
+ * 两种用法：
+ *   - 命令行：node --experimental-sqlite server/seed.js            → 强制重灌（清空后写入）
+ *            node --experimental-sqlite server/seed.js --if-empty → 仅当表为空才灌
+ *   - 被引用：require('./seed').seedIfEmpty()                       → 服务启动时自动补数据
  */
 const fs = require('fs');
 const path = require('path');
@@ -59,21 +63,9 @@ function extractBuiltinPapers(source) {
   throw new Error('未能匹配到数组结束 ]');
 }
 
-function main() {
-  // 「仅当空表才灌」模式：用于部署启动时自动补示例数据，且不清空用户已上传的试卷。
-  // 触发方式：node seed.js --if-empty  或  SEED_MODE=if-empty
-  const ifEmpty = process.argv.includes('--if-empty') || process.env.SEED_MODE === 'if-empty';
-  if (ifEmpty) {
-    const cnt = db.prepare('SELECT COUNT(*) AS n FROM papers').get().n;
-    if (cnt > 0) {
-      console.log(`papers 表已有 ${cnt} 条记录，跳过 seed（--if-empty）`);
-      return;
-    }
-  }
-
-  // 1) 优先用仓库内 JSON（部署环境没有 答岸.html）
+/** 载入内置试卷数组：JSON 优先，回退 HTML。 */
+function loadPapers() {
   let papers = loadPapersFromJson();
-  // 2) 回退：从本地 答岸.html 解析
   if (!papers) {
     if (!fs.existsSync(SRC)) {
       throw new Error('未找到内置试卷源：既无 ' + JSON_SRC + '，也无 ' + SRC);
@@ -84,7 +76,11 @@ function main() {
   if (!Array.isArray(papers) || papers.length === 0) {
     throw new Error('解析出的内置试卷为空');
   }
+  return papers;
+}
 
+/** 清空 papers/favorites 后写入内置试卷（会覆盖用户上传，仅用于强制重灌）。 */
+function writePapers(papers) {
   const deleteFav = db.prepare('DELETE FROM favorites');
   const deletePapers = db.prepare('DELETE FROM papers');
   const insert = db.prepare(
@@ -122,9 +118,38 @@ function main() {
   console.log(`seeded ${papers.length} papers`);
 }
 
-try {
-  main();
-} catch (e) {
-  console.error('种子脚本失败：', e.message);
-  process.exit(1);
+/**
+ * 仅当试卷表为空时才灌入示例数据（不会清空用户已上传的试卷）。
+ * 返回 true 表示执行了灌入，false 表示已有数据被跳过。
+ */
+function seedIfEmpty() {
+  const cnt = db.prepare('SELECT COUNT(*) AS n FROM papers').get().n;
+  if (cnt > 0) {
+    console.log(`papers 表已有 ${cnt} 条记录，跳过 seed（if-empty）`);
+    return false;
+  }
+  writePapers(loadPapers());
+  return true;
 }
+
+/** 命令行入口 */
+function main() {
+  const ifEmpty = process.argv.includes('--if-empty') || process.env.SEED_MODE === 'if-empty';
+  if (ifEmpty) {
+    seedIfEmpty();
+    return;
+  }
+  writePapers(loadPapers());
+}
+
+// 仅在被直接执行时运行；被 require 时不自动触发。
+if (require.main === module) {
+  try {
+    main();
+  } catch (e) {
+    console.error('种子脚本失败：', e.message);
+    process.exit(1);
+  }
+}
+
+module.exports = { seedIfEmpty, loadPapers, writePapers, loadPapersFromJson };
