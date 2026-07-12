@@ -4,7 +4,8 @@ services:
     runtime: node
     plan: free
     buildCommand: npm install
-    startCommand: npm start
+    # 启动时：仅当试卷表为空才灌入 14 张示例卷（不会清空用户上传），随后起服务
+    startCommand: npm run seed:ifempty && npm start
     healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV

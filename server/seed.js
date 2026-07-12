@@ -12,6 +12,19 @@ const path = require('path');
 const { db } = require('./db');
 
 const SRC = path.join(__dirname, '..', '..', '答岸.html');
+const JSON_SRC = path.join(__dirname, 'data', 'builtin-papers.json');
+
+/** 优先从仓库内 JSON 读取内置试卷（部署环境用）；返回 null 表示无 JSON。 */
+function loadPapersFromJson() {
+  if (!fs.existsSync(JSON_SRC)) return null;
+  try {
+    const arr = JSON.parse(fs.readFileSync(JSON_SRC, 'utf8'));
+    if (Array.isArray(arr) && arr.length > 0) return arr;
+  } catch (e) {
+    console.warn('读取 builtin-papers.json 失败，回退到 HTML 源：', e.message);
+  }
+  return null;
+}
 
 /** 从源码中安全提取 BUILTIN_PAPERS 数组字面量（平衡括号 + 字符串感知） */
 function extractBuiltinPapers(source) {
@@ -47,13 +60,29 @@ function extractBuiltinPapers(source) {
 }
 
 function main() {
-  if (!fs.existsSync(SRC)) {
-    throw new Error('找不到源文件：' + SRC);
+  // 「仅当空表才灌」模式：用于部署启动时自动补示例数据，且不清空用户已上传的试卷。
+  // 触发方式：node seed.js --if-empty  或  SEED_MODE=if-empty
+  const ifEmpty = process.argv.includes('--if-empty') || process.env.SEED_MODE === 'if-empty';
+  if (ifEmpty) {
+    const cnt = db.prepare('SELECT COUNT(*) AS n FROM papers').get().n;
+    if (cnt > 0) {
+      console.log(`papers 表已有 ${cnt} 条记录，跳过 seed（--if-empty）`);
+      return;
+    }
   }
-  const html = fs.readFileSync(SRC, 'utf8');
-  const papers = extractBuiltinPapers(html);
+
+  // 1) 优先用仓库内 JSON（部署环境没有 答岸.html）
+  let papers = loadPapersFromJson();
+  // 2) 回退：从本地 答岸.html 解析
+  if (!papers) {
+    if (!fs.existsSync(SRC)) {
+      throw new Error('未找到内置试卷源：既无 ' + JSON_SRC + '，也无 ' + SRC);
+    }
+    const html = fs.readFileSync(SRC, 'utf8');
+    papers = extractBuiltinPapers(html);
+  }
   if (!Array.isArray(papers) || papers.length === 0) {
-    throw new Error('解析出的 BUILTIN_PAPERS 为空');
+    throw new Error('解析出的内置试卷为空');
   }
 
   const deleteFav = db.prepare('DELETE FROM favorites');
