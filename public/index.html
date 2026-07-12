@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>答岸 · 每一个答案，都有它的岸</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;600;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+
+<!-- ===================== NAV ===================== -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand" id="brandHome">
+      <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <circle cx="16" cy="16" r="14" stroke="#AE7E36" stroke-width="2"/>
+        <path d="M9 21c3-1 4-7 7-7s4 6 7 7" stroke="#243044" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="16" cy="11.5" r="1.7" fill="#243044"/>
+      </svg>
+      答岸
+    </a>
+    <nav class="nav-links">
+      <a href="#top">首页</a>
+      <a href="#subjects">科目</a>
+      <a href="#bank">题库</a>
+      <a href="#" id="navUpload">上传</a>
+      <a href="#about">关于</a>
+    </nav>
+    <div class="nav-actions">
+      <button class="btn btn-gold desk-only" id="navUpload2">上传试卷</button>
+      <button class="btn btn-ghost desk-only" id="navFav">我的收藏</button>
+      <span id="authArea" class="auth-inner desk-only"></span>
+      <button class="hamburger" id="hamburger" aria-label="菜单">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h16" stroke="#243044" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- mobile drawer -->
+<div class="drawer-mask" id="drawerMask"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-top">
+    <span class="brand" style="font-size:18px;">答岸</span>
+    <button class="hamburger" id="drawerClose" aria-label="关闭">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#243044" stroke-width="2" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+  <a href="#top" data-drawer>首页</a>
+  <a href="#subjects" data-drawer>科目</a>
+  <a href="#bank" data-drawer>题库</a>
+  <a href="#" data-drawer id="drawerUpload">上传</a>
+  <a href="#about" data-drawer>关于</a>
+  <a href="#" data-drawer id="drawerFav">我的收藏</a>
+  <div id="drawerAuth" class="drawer-auth"></div>
+</aside>
+
+<!-- ===================== HERO ===================== -->
+<section class="hero" id="top">
+  <div class="wrap">
+    <h1>每一个答案，都有它的岸</h1>
+    <p class="sub">真实公开的历年试卷，按科目与年份整理归岸。检索、筛选、收藏、打印，让备考有迹可循。</p>
+    <div class="search-box">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M20 20l-3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <input type="text" id="heroSearch" placeholder="检索试卷，例如：新高考I卷、数学、作文…" />
+      <button class="btn" id="heroSearchBtn">检索</button>
+    </div>
+    <div class="hot-tags">
+      <span class="label">热门：</span>
+      <button data-tag="新高考I卷">新高考I卷</button>
+      <button data-tag="高考作文">高考作文</button>
+      <button data-tag="全国甲卷">全国甲卷</button>
+      <button data-tag="数学">数学真题</button>
+      <button data-tag="语法填空">语法填空</button>
+      <button data-tag="物理">物理</button>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat"><div class="num" id="stPapers">0</div><div class="lab">收录试卷</div></div>
+      <div class="stat"><div class="num" id="stSubjects">0</div><div class="lab">覆盖科目</div></div>
+      <div class="stat"><div class="num" id="stUsers">0</div><div class="lab">注册用户</div></div>
+      <div class="stat"><div class="num" id="stDownloads">0</div><div class="lab">累计下载</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SUBJECTS ===================== -->
+<section id="subjects">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>按科目上岸</h2>
+      <p>九门学科，点击任一张卡片即可在题库中按该科目筛选。</p>
+    </div>
+    <div class="subj-grid" id="subjGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== BANK ===================== -->
+<section id="bank" style="background:var(--paper-deep);">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>题库</h2>
+      <p>选择科目或用关键词即时检索；点击卡片查看试卷详情与真实题目。</p>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="bank-toolbar">
+      <div class="bank-search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#6E665A" stroke-width="2"/><path d="M20 20l-3-3" stroke="#6E665A" stroke-width="2" stroke-linecap="round"/></svg>
+        <input type="text" id="bankSearch" placeholder="在题库中检索标题或科目…" />
+      </div>
+      <button class="btn btn-gold" id="bankUpload">＋ 上传我的试卷</button>
+    </div>
+    <div class="paper-grid" id="paperGrid"></div>
+  </div>
+</section>
+
+<!-- ===================== ABOUT ===================== -->
+<section id="about">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>关于答岸</h2>
+      <p>「答岸」取「答案靠岸」之意——把散落各处的真实试卷，整理成可以停靠、检索、收藏的一处岸。</p>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow-sm);max-width:760px;">
+      <p style="margin-top:0;color:var(--text-soft);">本站的试卷标题、年份、考试类型均对应真实公开试卷；内嵌题目选自历年公开真题（如高考作文题、高考数学/英语/物理/化学/生物/历史/地理/政治选择题与填空题等），题面与参考答案力求真实可核验。所有数据以矢量图风格呈现，不含真实照片。</p>
+      <p style="color:var(--text-soft);">你上传的试卷与收藏记录都会保存在答岸的服务器上，用同一账户登录任意设备都能查看。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== FOOTER ===================== -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div>
+        <div class="f-brand">
+          <svg width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+            <circle cx="16" cy="16" r="14" stroke="#EADFC6" stroke-width="2"/>
+            <path d="M9 21c3-1 4-7 7-7s4 6 7 7" stroke="#EADFC6" stroke-width="2" stroke-linecap="round"/>
+            <circle cx="16" cy="11.5" r="1.7" fill="#EADFC6"/>
+          </svg>
+          答岸
+        </div>
+        <p style="color:#C9C0AE;max-width:300px;font-size:13px;margin-top:12px;">真实公开试卷的归岸之处。每一个答案，都有它的岸。</p>
+      </div>
+      <div class="f-links">
+        <div class="f-col">
+          <h4>导航</h4>
+          <a href="#top">首页</a>
+          <a href="#subjects">科目</a>
+          <a href="#bank">题库</a>
+        </div>
+        <div class="f-col">
+          <h4>功能</h4>
+          <a href="#" id="footUpload">上传试卷</a>
+          <a href="#" id="footFav">我的收藏</a>
+          <a href="#about">关于答岸</a>
+        </div>
+        <div class="f-col">
+          <h4>科目</h4>
+          <a href="#bank">语文 · 数学</a>
+          <a href="#bank">英语 · 物理</a>
+          <a href="#bank">化学 · 生物</a>
+        </div>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 答岸 DÁ ÀN</span>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="#AE7E36" aria-hidden="true"><path d="M12 21s-7-4.5-9.5-9C.8 8.4 2.6 5 6 5c2 0 3.2 1.2 4 2.4C10.8 6.2 12 5 14 5c3.4 0 5.2 3.4 3.5 7C19 16.5 12 21 12 21z"/></svg>
+      <span>用心整理，让备考有岸可靠。</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== DETAIL MODAL ===================== -->
+<div class="modal-mask" id="detailModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="m-title" id="dTitle"></div>
+        <div class="m-sub" id="dMeta"></div>
+      </div>
+      <button class="modal-close" id="dClose" aria-label="关闭">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="dBody"></div>
+    <div class="modal-foot">
+      <span class="modal-note grow">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+        在线预览中 · 满意可点击下方导出
+      </span>
+      <button class="btn btn-ghost" id="dFav">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 17.3l-5.4 3.2 1.4-6.1L3 10.3l6.2-.5L12 4l2.8 5.8 6.2.5-4.9 4.1 1.4 6.1z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        <span id="dFavText">收藏</span>
+      </button>
+      <button class="btn" id="dPrint">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 9V3h10v6M7 18h10v3H7zM5 9h14a2 2 0 0 1 2 2v5H3v-5a2 2 0 0 1 2-2z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>
+        打印 / 下载（导出）
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== UPLOAD MODAL ===================== -->
+<div class="modal-mask" id="uploadModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="m-title">上传我的试卷</div>
+        <div class="m-sub"><span class="tag">保存至答岸服务器</span></div>
+      </div>
+      <button class="modal-close" id="uClose" aria-label="关闭">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-2">
+        <div class="form-row">
+          <label>科目</label>
+          <select id="uSubject"></select>
+        </div>
+        <div class="form-row">
+          <label>年份</label>
+          <input type="number" id="uYear" placeholder="例如 2025" />
+        </div>
+      </div>
+      <div class="form-2">
+        <div class="form-row">
+          <label>考试类型</label>
+          <select id="uType">
+            <option>高考</option><option>中考</option><option>考研</option><option>期末</option><option>其他</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <label>卷别</label>
+          <input type="text" id="uVolume" placeholder="例如 新高考 I 卷" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label>试卷标题</label>
+        <input type="text" id="uTitle" placeholder="例如 2025 年新高考 I 卷 · 数学" />
+      </div>
+      <div class="form-row">
+        <label>题目（每行一题）</label>
+        <textarea id="uQuestions" placeholder="第一题题面…&#10;第二题题面…"></textarea>
+      </div>
+      <div class="form-row">
+        <label>参考答案 / 解析（每行一题，与上面顺序对应）</label>
+        <textarea id="uAnswers" placeholder="第一题答案…&#10;第二题答案…"></textarea>
+      </div>
+      <p class="hint">提交后会保存到服务器并立即加入题库，登录任意设备都能查看。</p>
+    </div>
+    <div class="modal-foot">
+      <span class="grow"></span>
+      <button class="btn btn-ghost" id="uCancel">取消</button>
+      <button class="btn btn-gold" id="uSubmit">提交试卷</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== LOGIN MODAL ===================== -->
+<div class="modal-mask" id="loginModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="m-title">登录答岸</div>
+        <div class="m-sub"><span class="tag">登录后即可同步你的收藏与上传</span></div>
+      </div>
+      <button class="modal-close" id="loginClose" aria-label="关闭">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>邮箱</label>
+        <input type="email" id="loginEmail" placeholder="注册时使用的邮箱" autocomplete="username" />
+      </div>
+      <div class="form-row">
+        <label>密码</label>
+        <input type="password" id="loginPwd" placeholder="请输入密码" autocomplete="current-password" />
+      </div>
+      <p class="hint">还没有账户？点击导航栏「注册」即可免费创建。</p>
+    </div>
+    <div class="modal-foot">
+      <span class="grow"></span>
+      <button class="btn btn-ghost" id="loginCancel">取消</button>
+      <button class="btn btn-gold" id="loginSubmit">登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== REGISTER MODAL ===================== -->
+<div class="modal-mask" id="registerModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div>
+        <div class="m-title">注册答岸</div>
+        <div class="m-sub"><span class="tag">数据保存至答岸服务器</span></div>
+      </div>
+      <button class="modal-close" id="regClose" aria-label="关闭">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <label>昵称</label>
+        <input type="text" id="regNick" placeholder="例如 小岸" autocomplete="nickname" />
+      </div>
+      <div class="form-row">
+        <label>邮箱</label>
+        <input type="email" id="regEmail" placeholder="用于登录的邮箱" autocomplete="email" />
+      </div>
+      <div class="form-2">
+        <div class="form-row">
+          <label>密码</label>
+          <input type="password" id="regPwd" placeholder="至少 6 位" autocomplete="new-password" />
+        </div>
+        <div class="form-row">
+          <label>确认密码</label>
+          <input type="password" id="regPwd2" placeholder="再次输入密码" autocomplete="new-password" />
+        </div>
+      </div>
+      <div class="form-row">
+        <label>手机号（可选）</label>
+        <input type="tel" id="regPhone" placeholder="11 位手机号，用于接收验证码" autocomplete="tel" />
+      </div>
+      <div class="form-row">
+        <label>验证码</label>
+        <div class="form-2" style="gap:10px;align-items:flex-end;">
+          <input type="text" id="regCode" placeholder="6 位验证码" inputmode="numeric" autocomplete="one-time-code" />
+          <button type="button" class="btn btn-ghost" id="regSendCode" style="white-space:nowrap;">发送验证码</button>
+        </div>
+      </div>
+      <p class="hint" id="regDemoHint" style="display:none;"></p>
+      <p class="hint">注册即表示同意以演示方式使用本站。密码将以 bcrypt 哈希安全存储，请使用你常用的登录密码。</p>
+    </div>
+    <div class="modal-foot">
+      <span class="grow"></span>
+      <button class="btn btn-ghost" id="regCancel">取消</button>
+      <button class="btn btn-gold" id="regSubmit">注册并登录</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div class="toast" id="toast"></div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

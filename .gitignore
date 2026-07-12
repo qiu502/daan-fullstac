@@ -1,0 +1,21 @@
+node_modules/
+.env
+server/data/*.db
+server/data/*.db-journal
+server/data/*.db-wal
+server/data/*.db-shm
+server.log
+npm-debug.log
+.DS_Store
+
+# 开发/测试临时文件（非源码，不入库）
+qa_*.sh
+qa_tmp/
+r_*.json
+reg_*.json
+up_utf*.json
+cookies.txt
+login.txt
+jar_*.txt
+qa_cookies.txt
+design-otp.md

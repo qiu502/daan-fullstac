@@ -1,0 +1,9 @@
+node_modules
+server/data
+.env
+.git
+.gitignore
+*.log
+qa_*.sh
+qa_tmp
+*.txt

@@ -1,0 +1,20 @@
+# 答岸 · Render Blueprint 配置
+# 用法：Render 控制台 → New → Blueprint → 连仓库 → 选本文件，一键部署。
+services:
+  - type: web
+    name: daan
+    runtime: node
+    plan: free
+    nodeVersion: "22"
+    buildCommand: "npm install"
+    startCommand: "npm start"
+    healthCheckPath: "/api/health"
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DB_PATH
+        value: server/data/daan.db
+# 注意：Render 免费层文件系统是临时的，重启/休眠后 server/data/daan.db 会被清空。
+# 仅适合演示。要持久化请改用 Fly.io（持久卷）或 VPS。
