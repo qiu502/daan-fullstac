@@ -34,6 +34,11 @@ app.use(cookieParser());
 /* ---------- 静态资源 ---------- */
 app.use(express.static(path.join(__dirname, '..', 'public')));
 
+// 兼容老式浏览器/爬虫对 /favicon.ico 的请求，避免 404
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'public', 'favicon.svg'));
+});
+
 /* ---------- API 路由 ---------- */
 app.get('/api/health', (req, res) => res.json({ ok: true, db: DB_PATH }));
 app.use('/api/auth', authRoutes);
