@@ -326,18 +326,13 @@
         </div>
       </div>
       <div class="form-row">
-        <label>手机号（可选）</label>
-        <input type="tel" id="regPhone" placeholder="11 位手机号，用于接收验证码" autocomplete="tel" />
-      </div>
-      <div class="form-row">
-        <label>验证码</label>
+        <label>验证码（发送至邮箱）</label>
         <div class="form-2" style="gap:10px;align-items:flex-end;">
           <input type="text" id="regCode" placeholder="6 位验证码" inputmode="numeric" autocomplete="one-time-code" />
           <button type="button" class="btn btn-ghost" id="regSendCode" style="white-space:nowrap;">发送验证码</button>
         </div>
       </div>
-      <p class="hint" id="regDemoHint" style="display:none;"></p>
-      <p class="hint">注册即表示同意以演示方式使用本站。密码将以 bcrypt 哈希安全存储，请使用你常用的登录密码。</p>
+      <p class="hint">我们向你的邮箱发送 6 位验证码完成注册验证。密码将以 bcrypt 哈希安全存储，请使用你常用的登录密码。</p>
     </div>
     <div class="modal-foot">
       <span class="grow"></span>

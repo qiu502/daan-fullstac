@@ -91,3 +91,23 @@
 
 - 想让我**直接把代码推到 GitHub 并触发 Render 部署** → 请在左侧连接器里连接你的 GitHub 账号（Render 同理）。
 - 或你本地按上面步骤操作，哪一步卡住告诉我，我接着帮你。
+
+---
+
+## 九、邮件验证码（Resend）环境变量配置
+
+注册验证码通过 **Resend** 真实发送，不再走演示模式。需在运行环境设置以下变量：
+
+| 变量 | 说明 | 取值示例 |
+|------|------|---------|
+| `RESEND_API_KEY` | Resend API Key（https://resend.com/api-keys 生成） | `re_xxxxxxxxxxxx` |
+| `MAIL_FROM` | 发件人（需在 Resend 验证过的域名，或测试用 `onboarding@resend.dev`） | `答岸 <onboarding@resend.dev>` |
+| `DEMO_MODE` | 必须为 `false`（默认即 false）；`true` 仅本地调试、不真发邮件且回显验证码 | `false` |
+
+**Render 配置位置**：服务 → **Settings → Environment** → 添加 Above 三个变量 → **Save Changes** → 触发重新部署。
+
+**验证是否生效**：部署后调用 `POST /api/auth/send-code` 传一个真实邮箱，去邮箱查收 6 位验证码；服务端日志出现 `[mailer] 验证码已发送至 xxx`。
+
+**未配置 `RESEND_API_KEY` 时**：自动降级为控制台打印验证码（不阻断注册流程），便于本地无 Key 调试；生产务必配置真实 Key。
+
+**发送失败的容错**：若 Resend 返回错误（如 Key 无效、额度用尽），`/send-code` 返回 `mail_send_failed`（502），提示"邮件发送失败，请稍后重试"，不会导致服务崩溃。

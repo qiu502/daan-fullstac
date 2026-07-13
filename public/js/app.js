@@ -440,7 +440,7 @@ function openRegister() {
 function closeRegister() {
   document.getElementById('registerModal').classList.remove('open');
   document.body.style.overflow = '';
-  ['regNick', 'regEmail', 'regPwd', 'regPwd2', 'regPhone', 'regCode'].forEach(id => document.getElementById(id).value = '');
+  ['regNick', 'regEmail', 'regPwd', 'regPwd2', 'regCode'].forEach(id => document.getElementById(id).value = '');
   // 复位验证码发码倒计时
   if (sendTimer) { clearInterval(sendTimer); sendTimer = null; }
   const sb = document.getElementById('regSendCode');
@@ -455,17 +455,14 @@ document.getElementById('regSubmit').addEventListener('click', async () => {
   const email = document.getElementById('regEmail').value.trim();
   const pwd = document.getElementById('regPwd').value;
   const pwd2 = document.getElementById('regPwd2').value;
-  const phone = document.getElementById('regPhone').value.trim();
   const code = document.getElementById('regCode').value.trim();
-  const t = pickSendTarget();
   if (!nick) { toast('请填写昵称'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast('邮箱格式不正确（注册需邮箱作登录标识）'); return; }
   if (pwd.length < 6) { toast('密码长度至少 6 位'); return; }
   if (pwd !== pwd2) { toast('两次输入的密码不一致'); return; }
   if (!code) { toast('请先获取并填写验证码'); return; }
-  if (!t) { toast('请先填写邮箱或手机号以发送验证码'); return; }
   const res = await api('POST', '/api/auth/register', {
-    nick, email, password: pwd, phone: phone || undefined, code, channel: t.channel
+    nick, email, password: pwd, code
   });
   if (!res.ok) { toast(await parseError(res)); return; }
   const d = await res.json();
@@ -475,14 +472,12 @@ document.getElementById('regSubmit').addEventListener('click', async () => {
   loadPapers();
 });
 
-/* ---------- 注册验证码发码（T5） ---------- */
+/* ---------- 注册验证码发码（仅邮箱） ---------- */
 let sendTimer = null;
 function pickSendTarget() {
   const email = document.getElementById('regEmail').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  if (email) return { contact: email.toLowerCase(), channel: 'email' };   // 邮箱优先
-  if (phone) return { contact: phone, channel: 'phone' };
-  return null;                                                             // 两者皆空 → 提示
+  if (email) return { contact: email.toLowerCase(), channel: 'email' };
+  return null;
 }
 function startSendCountdown(sec) {
   const btn = document.getElementById('regSendCode');
@@ -498,18 +493,12 @@ function startSendCountdown(sec) {
 }
 document.getElementById('regSendCode').addEventListener('click', async () => {
   const t = pickSendTarget();
-  if (!t) { toast('请先填写邮箱或手机号'); return; }
-  if (t.channel === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t.contact)) { toast('邮箱格式不正确'); return; }
-  if (t.channel === 'phone' && !/^1[3-9]\d{9}$/.test(t.contact)) { toast('手机号需为 11 位'); return; }
+  if (!t) { toast('请先填写邮箱'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(t.contact)) { toast('邮箱格式不正确'); return; }
   const res = await api('POST', '/api/auth/send-code', t);
   if (res.status === 429) { toast(await parseError(res)); return; }   // 节流，按钮维持禁用
   if (!res.ok) { toast(await parseError(res)); return; }
   const d = await res.json();
-  if (d.demoCode) {                                            // 仅 DEMO_MODE 响应含 demoCode
-    const hint = document.getElementById('regDemoHint');
-    hint.style.display = '';
-    hint.textContent = `演示验证码：${d.demoCode}（演示模式，真实环境将通过邮件/短信发送）`;
-  }
   startSendCountdown(60);                                      // 启动倒计时禁用按钮
 });
 document.getElementById('regPwd2').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('regSubmit').click(); });

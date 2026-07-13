@@ -25,6 +25,10 @@ const COOKIE_OPTS = {
 const CODE_TTL_SECONDS = Number(process.env.CODE_TTL_SECONDS || 300);  // 码有效期 5 分钟
 const CODE_LENGTH      = Number(process.env.CODE_LENGTH || 6);          // 验证码位数
 const RESEND_INTERVAL  = Number(process.env.RESEND_INTERVAL || 60);     // 重发节流 60 秒
-const DEMO_MODE        = process.env.DEMO_MODE !== 'false';             // 默认 true（演示）
+const DEMO_MODE        = process.env.DEMO_MODE === 'true';              // 默认 false（生产），仅显式 true 才走演示
 
-module.exports = { SECRET, ACCESS_EXPIRES, REFRESH_EXPIRES, COOKIE, COOKIE_OPTS, CODE_TTL_SECONDS, CODE_LENGTH, RESEND_INTERVAL, DEMO_MODE };
+// 邮件服务（Resend）
+const RESEND_API_KEY   = process.env.RESEND_API_KEY || '';
+const MAIL_FROM        = process.env.MAIL_FROM || '';
+
+module.exports = { SECRET, ACCESS_EXPIRES, REFRESH_EXPIRES, COOKIE, COOKIE_OPTS, CODE_TTL_SECONDS, CODE_LENGTH, RESEND_INTERVAL, DEMO_MODE, RESEND_API_KEY, MAIL_FROM };
